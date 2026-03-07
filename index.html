@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="あなたに似合う色がわかる！16タイプパーソナルカラー診断。簡単な質問に答えるだけで、自分らしさを引き出す色が見つかります。">
+  <meta property="og:title" content="16タイプ パーソナルカラー診断">
+  <meta property="og:description" content="あなたに似合う色、見つけてみませんか？簡単4問で診断！">
+  <meta property="og:type" content="website">
+  <title>16タイプ パーソナルカラー診断｜あなたに似合う色を見つけよう</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-ivory: #fdfbf7;
+      --bg-cream: #f9f6f0;
+      --text-dark: #2d2a26;
+      --text-soft: #5a5550;
+      --accent-coral: #e8a598;
+      --accent-sage: #9cad9a;
+      --accent-mauve: #b8a9c4;
+      --accent-amber: #c4a574;
+      --spring-light: #fce8dd;
+      --summer-light: #ebe5ec;
+      --autumn-light: #ede4d8;
+      --winter-light: #e6e4ed;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --shadow-hover: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-ivory);
+      color: var(--text-dark);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+      min-height: 100vh;
+    }
+
+    /* イントロ */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.5s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .intro {
+      text-align: center;
+      padding: 3rem 0 4rem;
+    }
+
+    .intro-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--accent-coral);
+      margin-bottom: 0.5rem;
+    }
+
+    .intro h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .intro p {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d4a59a 0%, #c4958a 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(196,149,138,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(196,149,138,0.45);
+    }
+
+    /* 診断 */
+    .quiz { padding: 1.5rem 0; }
+
+    .progress-bar {
+      height: 6px;
+      background: #ebe6e0;
+      border-radius: 3px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-coral), var(--accent-sage));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .option {
+      padding: 1rem 1.25rem;
+      background: white;
+      border: 2px solid #ebe6e0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: left;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .option:hover {
+      border-color: var(--accent-coral);
+      background: #fffbf9;
+      box-shadow: var(--shadow-hover);
+    }
+
+    .option.selected {
+      border-color: var(--accent-sage);
+      background: linear-gradient(135deg, #f8faf6 0%, #f2f7ef 100%);
+      box-shadow: 0 0 0 1px var(--accent-sage);
+    }
+
+    .quiz-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-soft);
+      border: 1px solid #d4cfc8;
+    }
+
+    .btn-ghost:hover { background: #f5f3ef; }
+
+    .btn-ghost:disabled,
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 結果 */
+    .result { padding: 1rem 0 2rem; }
+
+    .result-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .result-badge.spring { background: var(--spring-light); color: #8b5a2b; }
+    .result-badge.summer { background: var(--summer-light); color: #5c4a6e; }
+    .result-badge.autumn { background: var(--autumn-light); color: #6b5344; }
+    .result-badge.winter { background: var(--winter-light); color: #3d3a5c; }
+
+    .result h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-catch {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid #f0ece6;
+    }
+
+    .result-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .result-section:last-child { margin-bottom: 0; }
+
+    .result-section h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .result-section h3::before {
+      content: "";
+      width: 4px;
+      height: 1em;
+      background: linear-gradient(180deg, var(--accent-coral), var(--accent-sage));
+      border-radius: 2px;
+    }
+
+    .result-section p {
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      line-height: 1.8;
+    }
+
+    .color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1rem 0;
+    }
+
+    .color-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.8);
+    }
+
+    .share-area {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1.25rem;
+      background: var(--bg-cream);
+      border-radius: var(--radius);
+    }
+
+    .share-area p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 1rem;
+    }
+
+    .share-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: white;
+      transition: transform 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .share-btn:hover { transform: scale(1.05); }
+
+    .share-btn.twitter { background: #1DA1F2; }
+    .share-btn.line { background: #06C755; }
+    .share-btn.copy {
+      background: var(--text-soft);
+      color: white;
+    }
+
+    .retry-wrap { text-align: center; margin-top: 2rem; }
+
+    .retry-btn {
+      background: transparent;
+      color: var(--text-soft);
+      border: 1px solid #d4cfc8;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .retry-btn:hover {
+      background: #f5f3ef;
+      color: var(--text-dark);
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-dark);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+
+    .copy-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (min-width: 600px) {
+      .app { max-width: 520px; padding: 0 2rem 4rem; }
+      .intro h1 { font-size: 2.25rem; }
+      .question-text { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="intro" class="screen active">
+      <div class="intro">
+        <p class="intro-sub">PERSONAL COLOR</p>
+        <h1>16タイプ<br>パーソナルカラー診断</h1>
+        <p>あなたに似合う色、見つけてみませんか？<br>簡単4問で、自分らしさを引き出す色がわかります。</p>
+        <button class="btn btn-primary" id="start-btn">診断を始める</button>
+      </div>
+    </section>
+
+    <section id="quiz" class="screen">
+      <div class="quiz">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-text" id="progress-text">質問 1 / 4</p>
+        <h2 class="question-text" id="question-text"></h2>
+        <div class="options" id="options"></div>
+        <div class="quiz-nav">
+          <button class="btn btn-ghost" id="prev-btn" disabled>戻る</button>
+          <button class="btn btn-primary" id="next-btn">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="screen">
+      <div class="result">
+        <div class="result-badge" id="result-badge"></div>
+        <h2 id="result-title"></h2>
+        <p class="result-catch" id="result-catch"></p>
+        <div class="result-card">
+          <div class="result-section">
+            <h3>あなたの魅力</h3>
+            <p id="result-desc"></p>
+          </div>
+          <div class="result-section">
+            <h3>似合う色</h3>
+            <div class="color-palette" id="color-palette"></div>
+            <p id="result-colors"></p>
+          </div>
+          <div class="result-section">
+            <h3>今日からできるアドバイス</h3>
+            <p id="result-advice"></p>
+          </div>
+        </div>
+        <div class="share-area">
+          <p>診断結果を友達にシェアしよう！</p>
+          <div class="share-btns">
+            <a class="share-btn twitter" id="share-twitter" href="#" target="_blank" rel="noopener">𝕏 シェア</a>
+            <a class="share-btn line" id="share-line" href="#" target="_blank" rel="noopener">LINE</a>
+            <button class="share-btn copy" id="share-copy">リンクをコピー</button>
+          </div>
+        </div>
+        <div class="retry-wrap">
+          <button class="retry-btn" id="retry-btn">もう一度診断する</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="copy-toast" id="copy-toast">コピーしました！</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
